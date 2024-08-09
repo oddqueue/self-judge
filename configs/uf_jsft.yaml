@@ -1,0 +1,35 @@
+training_args:
+  output_dir: "experiments/uf_jsft"
+  per_device_train_batch_size: 16
+  gradient_accumulation_steps: 1
+  gradient_checkpointing: True
+  learning_rate: 2e-5
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.03
+  num_train_epochs: 1
+  logging_steps: 1
+  report_to: "wandb"
+  save_strategy: "epoch"
+  seed: 42
+  remove_unused_columns: False
+  bf16: True
+
+jsft_args:
+  max_length: 2048
+
+model:
+  pretrained_model_name_or_path: "meta-llama/Llama-2-7b-hf"
+  attn_implementation: "flash_attention_2"
+
+templates:
+  skip_first_token: True
+  chat: "<|system|>\n{% for message in messages %}{% if loop.first and message['role'] == 'system' %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{ '\n<|user|>\n' + message['content']}}{% elif message['role'] == 'assistant' %}{{ '\n<|assistant|>\n' + message['content'] + eos_token }}{% endif %}{% if loop.last and add_generation_prompt %}\n{{ '\n<|assistant|>\n' }}{% endif %}{% endfor %}"
+  user: "\n<|user|>\n"
+  assistant: "\n<|assistant|>\n"
+  judge:
+    base:
+      system: "Below are a series of dialogues between a human user and an AI assistant. The AI tries to be helpful, honest, truthful and follows the instructions from human."
+      user: "Which is the better response to be an assistant who is helpful, honest, truthful and following the given instruction from user?\n\nInstruction:\n-----\n{context}\n-----\n\nResponse A:\n-----\n{response_a}\n-----\n\nResponse B:\n-----\n{response_b}\n-----\n\nPlease choose either A or B.\n"
+      assistant: "Sure! The option which is more helpful, honest, truthful and following the given instruction from user would be Response"
+  
+dataset: "openbmb/UltraFeedback"

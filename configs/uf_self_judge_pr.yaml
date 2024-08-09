@@ -1,0 +1,64 @@
+training_args:
+  output_dir: "experiments/uf_self_judge_pr"
+  per_device_train_batch_size: 8
+  gradient_accumulation_steps: 1
+  gradient_checkpointing: True
+  learning_rate: 5e-6
+  lr_scheduler_type: "constant_with_warmup"
+  warmup_ratio: 0.1
+  num_train_epochs: 3
+  logging_steps: 1
+  report_to: "wandb"
+  save_strategy: "epoch"
+  seed: 42
+  remove_unused_columns: False
+  bf16: True
+
+self_judge_args:
+  token_id_a: 319
+  token_id_b: 350
+  disable_dropout: True
+  judge_batch_size: 8
+  max_length: 2048
+  max_new_tokens: 768
+  top_p: 0.9
+  temperature: 1.0
+  loss_type: "sigmoid"
+  beta: 0.1
+
+model:
+  pretrained_model_name_or_path: "experiments/uf_jsft_pr"
+  attn_implementation: "flash_attention_2"
+
+peft_config:
+  r: 8
+  lora_alpha: 16
+  lora_dropout: 0.1
+
+templates:
+  skip_first_token: True
+  chat: "<|system|>\n{% for message in messages %}{% if loop.first and message['role'] == 'system' %}{{ message['content'] }}{% elif message['role'] == 'user' %}{{ '\n<|user|>\n' + message['content']}}{% elif message['role'] == 'assistant' %}{{ '\n<|assistant|>\n' + message['content'] + eos_token }}{% endif %}{% if loop.last and add_generation_prompt %}\n{{ '\n<|assistant|>\n' }}{% endif %}{% endfor %}"
+  user: "\n<|user|>\n"
+  assistant: "\n<|assistant|>\n"
+  judge:
+    helpfulness: 
+      system: "Under the principle of 'helpfulness', the assistant should provide users with accurate, relevant, and up-to-date information, ensuring that the content is positive, interesting, engaging, educational, and helpful."
+      user: "Which is the better response for an assistant when following the principle of 'helpfulness' for a given instruction?\n\nInstruction:\n-----\n{context}\n-----\n\nResponse A:\n-----\n{response_a}\n-----\n\nResponse B:\n-----\n{response_b}\n-----\n\nPlease choose either A or B and evaluate each response according to the principle of 'helpfulness'."
+      assistant: "Sure! Here is the decision of better response and evaluations of each response, guided by the principle of 'helpfulness'.\n"
+    honesty:
+      system: "Under the principle of 'honesty', the assistant should be honest about whether it knows the answer and express its uncertainty explicitly. The assistant should confident on questions it knows well and be modest on those it is unfamiliar with using weakeners such as 'I guess', 'I suppose', 'probably', and 'perhaps' to express uncertainty."
+      user: "Which is the better response for an assistant when following the principle of 'honesty' for a given instruction?\n\nInstruction:\n-----\n{context}\n-----\n\nResponse A:\n-----\n{response_a}\n-----\n\nResponse B:\n-----\n{response_b}\n-----\n\nPlease choose either A or B and evaluate each response according to the principle of 'honesty'."
+      assistant: "Sure! Here is the decision of better response and evaluations of each response, guided by the principle of 'honesty'.\n"
+    instruction_following:
+      system: "Under the principle of 'instruction following', the assistant should align the output with intent of instruction, by understanding the task goal (intended outcome) and restrictions (text styles, format or designated methods, etc.)."
+      user: "Which is the better response for an assistant when following the principle of 'instruction following' for a given instruction?\n\nInstruction:\n-----\n{context}\n-----\n\nResponse A:\n-----\n{response_a}\n-----\n\nResponse B:\n-----\n{response_b}\n-----\n\nPlease choose either A or B and evaluate each response according to the principle of 'instruction following'."
+      assistant: "Sure! Here is the decision of better response and evaluations of each response, guided by the principle of 'instruction following'.\n"
+    truthfulness:
+      system: "Under the principle of 'truthfulness', the assistant should answer truthfully and be faithful to factual knowledge as well as given contexts, never making up any new facts that aren’t true or cannot be grounded in the instruction."
+      user: "Which is the better response for an assistant when following the principle of 'truthfulness' for a given instruction?\n\nInstruction:\n-----\n{context}\n-----\n\nResponse A:\n-----\n{response_a}\n-----\n\nResponse B:\n-----\n{response_b}\n-----\n\nPlease choose either A or B and evaluate each response according to the principle of 'truthfulness'."
+      assistant: "Sure! Here is the decision of better response and evaluations of each response, guided by the principle of 'truthfulness'.\n"
+  decision_rationale:
+    decision: "\nDecision: Response"
+    rationale: "\nEvaluation of Response {position}:"
+  
+dataset: "openbmb/UltraFeedback"

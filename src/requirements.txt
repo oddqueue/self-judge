@@ -1,0 +1,10 @@
+wandb
+setuptools==58.2.0
+omegaconf==2.0.0
+sentencepiece==0.2.0
+transformers==4.41.0
+datasets==2.19.1
+trl==0.8.6
+accelerate==0.30.1
+deepspeed==0.14.2
+bitsandbytes==0.43.3
