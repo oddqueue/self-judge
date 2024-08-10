@@ -71,7 +71,7 @@ accelerate launch --config_file=configs/jsft_accelerate.yaml train_jsft.py --con
 ```
 
 
-## Self-Training by On-Policy Self-Judgment
+## Self-Training by On-Policy Judgment
 
 We provide `SelfJudgeCollator` and `SelfJudgeTrainer` which can be used as:
 
@@ -133,15 +133,15 @@ responses = [["response_0_0", "response_0_1"],
             ]
 
 winners = tournament_rejection_sampling(
-            model,
-            tokenizer,
-            judge_templates,
-            token_id_a,
-            token_ids_b,
-            contexts,
-            responses,
-            max_length,
-            judge_batch_sizes,
+            model=model,
+            tokenizer=tokenizer,
+            judge_templates=judge_templates,
+            token_id_a=token_id_a,
+            token_id_b=token_id_b,
+            contexts=contexts,
+            responses=responses,
+            max_length=max_length,
+            judge_batch_size=judge_batch_sizes,
           )
 
 ```
