@@ -102,7 +102,7 @@ trainer.train()
 - `query`: a string where the model starts the continuation.
 - `context`: a string of context for performing the judgment between a sampled response pair.
 - `chosen`: a string corresponds to an example of chosen response. **(only used on evaluations)**
-- `rejected`: a string corresponds to an example of chosen response. **(only used on evaluations)**
+- `rejected`: a string corresponds to an example of rejected response. **(only used on evaluations)**
 
 The included example training scripts can be used as:
 
