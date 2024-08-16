@@ -110,10 +110,10 @@ The included example training scripts can be used as:
 # HH-Helpful
 accelerate launch --config_file=configs/self_judge_accelerate.yaml train_self_judge.py --config=configs/hh_self_judge.yaml
 
-## UltraFeedback
+# UltraFeedback
 accelerate launch --config_file=configs/self_judge_accelerate.yaml train_self_judge.py --config=configs/uf_self_judge.yaml
 
-## UltraFeedback with principles and rationale
+# UltraFeedback with principles and rationale
 accelerate launch --config_file=configs/self_judge_accelerate.yaml train_self_judge.py --config=configs/uf_self_judge_pr.yaml
 ```
 
